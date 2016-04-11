@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			xmlns:s="library://ns.adobe.com/flex/spark"
+			xmlns:mx="library://ns.adobe.com/flex/mx" 
+			title="Output Settings"
+			close="closeWindow()">
+
+    <fx:Metadata>
+        [Event(name="resizeComplete", type="flash.events.Event")]
+    </fx:Metadata>
+
+    <fx:Script>
+        <![CDATA[
+        import mx.managers.PopUpManager;
+		
+		import mx.controls.Alert;
+
+        import org.lmn.laserRaster.LaserConfiguration;
+
+        import org.lmn.laserRaster.classes.RasterImage;
+
+        private var myImage:RasterImage;
+
+        private var data:LaserConfiguration;
+
+        public function initWindow(incomingImage:RasterImage):void
+        {
+            myImage = incomingImage;
+            newHeight.text = myImage.imageHeightInMM.toString();
+            newWidth.text = myImage.imageWidthInMM.toString();
+        }
+
+        public function initWindow2(incomingData:LaserConfiguration):void
+        {
+            data = incomingData;
+			newResolution.text = data.newResolutionMM.toString();
+            newSpeed.text = data.newSpeedP.toString();
+            maxPower.text = data.maxPowerP.toString();
+            minPower.text = data.minPowerP.toString();
+            newStartx.text = data.newStartxP.toString();
+            newStarty.text = data.newStartyP.toString();
+        }
+
+        public function closeWindow():void
+        {
+            PopUpManager.removePopUp(this);
+        }
+
+        private function saveButton_clickHandler(event:MouseEvent):void
+        {
+            data.newData(Number(newResolution.text), Number(newSpeed.text), Number(maxPower.text), Number(minPower.text), Number(newStartx.text), Number(newStarty.text));
+			myImage.resizeImage(Number(newHeight.text), Number(newWidth.text));
+            var e:Event = new Event("resizeComplete");
+            dispatchEvent(e);
+            closeWindow();
+        }
+
+        private function constrain_clickHandler(event:MouseEvent):void
+        {
+            var scaleX:Number = Number(newHeight.text) / myImage.imageHeightInMM;
+            newWidth.text = (myImage.imageWidthInMM * scaleX).toString();
+        }
+        ]]>
+    </fx:Script>
+	
+
+
+    <s:layout>
+        <s:FormLayout gap="-12" />
+    </s:layout>
+        <s:Spacer height="20" />
+        <s:FormItem label="Laser Power:" />	
+    <s:FormItem label="                              Max (%)">
+        <s:TextInput id="maxPower" />
+    </s:FormItem>
+    <s:FormItem label="                               Min (%)">
+        <s:TextInput id="minPower" />
+    </s:FormItem>
+        <s:Spacer height="25" />
+	<s:FormItem label="         XY Burn Speed (%)">
+        <s:TextInput id="newSpeed" />
+    </s:FormItem>
+        <s:Spacer height="25" />
+        <s:FormItem label="Image Position:" />
+    <s:FormItem label="                               X (mm)">
+        <s:TextInput id="newStartx" />
+    </s:FormItem>
+    <s:FormItem label="                               Y (mm)">
+        <s:TextInput id="newStarty" />
+    </s:FormItem>
+        <s:Spacer height="25" />
+	<s:FormItem label="Image Resolution (mm)">
+        <s:TextInput id="newResolution" />
+    </s:FormItem>
+        <s:Spacer height="25" />
+        <s:FormItem label="Image Size:" />
+    <s:FormItem label="                      Height (mm)    ">
+        <s:TextInput id="newHeight" />
+    </s:FormItem>
+    <s:FormItem label="                       Width (mm)">
+        <s:TextInput id="newWidth" />
+    </s:FormItem>
+        <s:Spacer height="25" />
+
+    <s:controlBarLayout>
+        <s:ConstraintLayout />
+    </s:controlBarLayout>
+
+    <s:controlBarContent>
+        <s:Button label="Constrain Width" left="10" top="5" bottom="5" click="constrain_clickHandler(event)" />
+        <s:Button label="Save" right="10" top="5" bottom="5" click="saveButton_clickHandler(event)" />
+    </s:controlBarContent>
+
+</s:TitleWindow>

@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			xmlns:s="library://ns.adobe.com/flex/spark"
+			xmlns:mx="library://ns.adobe.com/flex/mx" 
+			title="Startup Settings"
+			close="closeWindow()">
+
+    <fx:Metadata>
+        [Event(name="startupComplete", type="flash.events.Event")]
+    </fx:Metadata>
+
+    <fx:Script>
+        <![CDATA[
+        import mx.managers.PopUpManager;
+		import org.lmn.laserRaster.StartConfiguration;
+		
+		import mx.controls.Alert;
+
+        //import org.lmn.laserRaster.LaserConfiguration;
+
+        //import org.lmn.laserRaster.classes.RasterImage;
+
+        //private var myImage:RasterImage;
+
+        private var sdata:StartConfiguration;
+		
+        public function closeWindow():void
+        {
+            PopUpManager.removePopUp(this);
+        }
+
+        private function saveButton_clickHandler(event:MouseEvent):void
+        {
+            sdata.startData();//Boolean(tsm), Boolean(tmd), Boolean(tlg), Boolean(tel)
+            var e:Event = new Event("startupComplete");
+            dispatchEvent(e);
+            closeWindow();
+        }
+        ]]>
+    </fx:Script>
+	
+
+
+    <s:layout>
+        <s:FormLayout gap="-12" />
+    </s:layout>
+        <s:Spacer height="20" />
+	
+    <s:FormItem label="Tooli Machine Size">
+    </s:FormItem>
+        <s:Spacer height="40" />
+	<s:Spacer width="40" />
+    <s:Group>
+    <s:layout>
+        <s:VerticalLayout paddingLeft="40" paddingBottom="20" />
+    </s:layout>		
+        <s:Spacer width="50" />
+    <s:RadioButton groupName="toolisize"
+				   id="tsm"
+                   label="Small"
+				   selected="true" />
+    <s:RadioButton groupName="toolisize"
+				   id="tmd"
+                   label="Medium"
+				   selected="false" />
+    <s:RadioButton groupName="toolisize"
+				   id="tlg"
+                   label="Large"
+				   selected="false" />
+    <s:RadioButton groupName="toolisize"
+				   id="tel"
+                   label="XLarge"
+				   selected="false" />
+	</s:Group>
+	
+        <s:Spacer height="25" />
+    <s:controlBarLayout>
+        <s:ConstraintLayout />
+    </s:controlBarLayout>
+    <s:controlBarContent>
+        <s:Button label="Save" right="48" top="5" bottom="5" click="saveButton_clickHandler(event)" />
+    </s:controlBarContent>
+</s:TitleWindow>
