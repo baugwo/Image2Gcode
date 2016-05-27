@@ -11,6 +11,7 @@
 
     <fx:Script>
         <![CDATA[
+		import flash.events.MouseEvent;
         import mx.managers.PopUpManager;
 		
 		import mx.controls.Alert;
@@ -22,6 +23,10 @@
         private var myImage:RasterImage;
 
         private var data:LaserConfiguration;
+		
+		public var newSweep:String;
+		
+		public var vertical:Boolean = true;
 
         public function initWindow(incomingImage:RasterImage):void
         {
@@ -39,27 +44,68 @@
             minPower.text = data.minPowerP.toString();
             newStartx.text = data.newStartxP.toString();
             newStarty.text = data.newStartyP.toString();
+            newBorder.text = data.newBorderP.toString();
+            newSweep = data.newSweepP.toString();
+			
+			if (newSweep == "Horizontal") 
+			{				
+				hori.selected = true;
+			}
+			else if (newSweep == "Vertical") 
+			{				
+				vert.selected = true;
+			}
+			else if (newSweep == "Diagonal") 
+			{				
+				diag.selected = true;
+			}
+			
+			
         }
 
         public function closeWindow():void
         {
             PopUpManager.removePopUp(this);
         }
+		
+		private function hori_clickHandler(event:MouseEvent):void
+		{
+			newSweep = "Horizontal";
+		}
+		
+		private function vert_clickHandler(event:MouseEvent):void
+		{
+			newSweep = "Vertical";
+		}
+		
+		private function diag_clickHandler(event:MouseEvent):void
+		{
+			newSweep = "Diagonal";
+		}
 
         private function saveButton_clickHandler(event:MouseEvent):void
-        {
-            data.newData(Number(newResolution.text), Number(newSpeed.text), Number(maxPower.text), Number(minPower.text), Number(newStartx.text), Number(newStarty.text));
-			myImage.resizeImage(Number(newHeight.text), Number(newWidth.text));
+        {			
+            data.newData(Number(newResolution.text), int(newSpeed.text), int(maxPower.text), int(minPower.text), Number(newStartx.text), Number(newStarty.text), int(newBorder.text), String(newSweep));
+			myImage.borders(int(newBorder.text));
             var e:Event = new Event("resizeComplete");
             dispatchEvent(e);
             closeWindow();
         }
 
         private function constrain_clickHandler(event:MouseEvent):void
-        {
-            var scaleX:Number = Number(newHeight.text) / myImage.imageHeightInMM;
-            newWidth.text = (myImage.imageWidthInMM * scaleX).toString();
-        }
+        {			
+            var div:Number = 1 / Number(newResolution.text);
+			var newH:Number = toFixed((myImage.imageHeightInPX / div), 2);
+			var newW:Number = toFixed((myImage.imageWidthInPX / div), 2);
+            newHeight.text = newH.toString();
+            newWidth.text = newW.toString();
+        }			
+		
+		static public function toFixed(number:Number, precision:int):Number
+		{
+				precision = Math.pow(10, precision);
+				return Math.round(number * precision) / precision;
+		}
         ]]>
     </fx:Script>
 	
@@ -69,36 +115,70 @@
         <s:FormLayout gap="-12" />
     </s:layout>
         <s:Spacer height="20" />
+	
+    <s:FormItem label="Laser Path Direction:">
+    </s:FormItem>
+        <s:Spacer height="30" />
+	
+	<s:Group>
+    <s:layout>
+        <s:HorizontalLayout />
+    </s:layout>
+        <s:Spacer width="37" />
+    <s:RadioButton groupName="direction"
+				   id="hori"
+                   label="Horizontal"				   
+				   selected="false" 
+				   click="hori_clickHandler(event)"/>
+        <s:Spacer width="10" />
+    <s:RadioButton groupName="direction"
+				   id="vert"
+                   label="Vertical"
+				   selected="false"  
+				   click="vert_clickHandler(event)" />
+        <s:Spacer width="10" />
+    <s:RadioButton groupName="direction"
+				   id="diag"
+                   label="Diagonal"
+				   selected="false"   
+				   click="diag_clickHandler(event)" />
+	</s:Group>
+	
+        <s:Spacer height="40" />	
         <s:FormItem label="Laser Power:" />	
-    <s:FormItem label="                              Max (%)">
+    <s:FormItem label="                                 Max (%)">
         <s:TextInput id="maxPower" />
     </s:FormItem>
-    <s:FormItem label="                               Min (%)">
+    <s:FormItem label="                                  Min (%)">
         <s:TextInput id="minPower" />
     </s:FormItem>
         <s:Spacer height="25" />
-	<s:FormItem label="         XY Burn Speed (%)">
+	<s:FormItem label="            XY Burn Speed (%)">
         <s:TextInput id="newSpeed" />
     </s:FormItem>
         <s:Spacer height="25" />
         <s:FormItem label="Image Position:" />
-    <s:FormItem label="                               X (mm)">
+    <s:FormItem label="                                  X (mm)">
         <s:TextInput id="newStartx" />
     </s:FormItem>
-    <s:FormItem label="                               Y (mm)">
+    <s:FormItem label="                                  Y (mm)">
         <s:TextInput id="newStarty" />
     </s:FormItem>
         <s:Spacer height="25" />
-	<s:FormItem label="Image Resolution (mm)">
+	<s:FormItem label="Inter-Pixel Distance (mm)">
         <s:TextInput id="newResolution" />
     </s:FormItem>
         <s:Spacer height="25" />
-        <s:FormItem label="Image Size:" />
-    <s:FormItem label="                      Height (mm)    ">
-        <s:TextInput id="newHeight" />
+	<s:FormItem label="Engrave Border (passes)">
+        <s:TextInput id="newBorder" />
     </s:FormItem>
-    <s:FormItem label="                       Width (mm)">
-        <s:TextInput id="newWidth" />
+        <s:Spacer height="25" />
+        <s:FormItem label="Image Size:" />
+    <s:FormItem label="                          Width (mm)    ">
+        <s:Label id="newWidth" />
+    </s:FormItem>
+    <s:FormItem label="                         Height (mm)">
+        <s:Label id="newHeight" />
     </s:FormItem>
         <s:Spacer height="25" />
 
@@ -107,7 +187,7 @@
     </s:controlBarLayout>
 
     <s:controlBarContent>
-        <s:Button label="Constrain Width" left="10" top="5" bottom="5" click="constrain_clickHandler(event)" />
+        <s:Button label="Update Size" left="10" top="5" bottom="5" click="constrain_clickHandler(event)" />
         <s:Button label="Save" right="10" top="5" bottom="5" click="saveButton_clickHandler(event)" />
     </s:controlBarContent>
 

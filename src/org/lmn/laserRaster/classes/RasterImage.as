@@ -29,11 +29,14 @@ package org.lmn.laserRaster.classes
 		public var source:Bitmap = new Bitmap();
 		public var bwMatrix:Array = [0.22, 0.71, 0.06, 0, 0, 0.22, 0.71, 0.06, 0, 0, 0.22, 0.71, 0.06, 0, 0, 0, 0, 0, 1, 0];
 		public var bwFilter:ColorMatrixFilter;
+		
+		public static var frName:String = new String();
 
 		[Bindable] public var imageLoaded:Boolean = false;
 
 		private var fr:FileReference = new FileReference();
 		private var frSave:FileReference = new FileReference();
+		private var border:int = 0;
 
 		public function RasterImage()
 		{
@@ -56,6 +59,7 @@ package org.lmn.laserRaster.classes
 		private function selectedFile(event:Event):void
 		{
 			fr.load();
+			frName = fr.name;
 		}
 
 		private function fileLoaded(event:Event):void
@@ -87,6 +91,11 @@ package org.lmn.laserRaster.classes
 			newBitmap.draw(source.bitmapData, new Matrix(scaleX, 0, 0, scaleY));
 
 			source = new Bitmap(newBitmap);
+		}
+
+		public function borders(newBorder:int):void 
+		{
+			border = newBorder;
 		}
 
 		public function rotateImage():void
@@ -121,17 +130,32 @@ package org.lmn.laserRaster.classes
 			trace("[ERROR] ",event.text);
 			var e:Event = new Event("ExportFailed");
 			dispatchEvent(e);
+		}			
+		
+		static public function toFixed(number:Number, precision:int):Number
+		{
+				precision = Math.pow(10, precision);
+				return Math.round(number * precision) / precision;
 		}
 
+		public function get imageWidthInPX():Number
+		{
+			return source.width;//PPPX;
+		}
+
+		public function get imageHeightInPX():Number
+		{
+			return source.height;//PPPX;
+		}
 
 		public function get imageWidthInMM():Number
 		{
-			return source.width / (1 / LaserConfiguration.RES);//PPMM;
+			return toFixed((source.width / (1 / LaserConfiguration.RES)), 2);//PPMM;
 		}
 
 		public function get imageHeightInMM():Number
 		{
-			return source.height / (1 / LaserConfiguration.RES)//PPMM;
+			return toFixed((source.height / (1 / LaserConfiguration.RES)), 2);//PPMM;
 		}
 
 		public function get imageWidthInInch():Number
@@ -151,7 +175,7 @@ package org.lmn.laserRaster.classes
 
 		public function getPrintTime():Number
 		{
-			return ((imageHeightInMM / LaserConfiguration.RES) * imageWidthInMM) / (LaserConfiguration.SPD * 100);
+			return ((((imageHeightInPX * imageWidthInMM)  / (LaserConfiguration.SPD * 100)) * 2.57) +  ((((imageHeightInMM + imageWidthInMM) * 2) * border) / (LaserConfiguration.SPD * 100))) + 0.5;
 		}
 
 		public function get fileName():String

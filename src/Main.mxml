@@ -40,7 +40,7 @@
             btnColorBW.setStyle("icon", glyphIcons.drawTile(100));
             btnRotate.setStyle("icon",glyphIcons.drawTile(28));
             statusLabel.text = "Ready to load image.";
-			brandLabel.text = "Image2Gcode by Toolbotics  | ";
+			brandLabel.text = "1.1    |    Image2Gcode by Toolbotics    |     ";
 			//startDialog();
 
         }
@@ -73,7 +73,7 @@
         protected function btnOpen_clickHandler(event:MouseEvent):void
         {
             clearImageContainer();
-            statusLabel.text = "Waiting for image...";
+            statusLabel.text = "   Waiting for image...";
             myImage.addEventListener("RasterImageUpdate", imageLoaded);
             myImage.loadImageFromDisk();
         }
@@ -81,15 +81,15 @@
 
         private function imageLoaded(event:Event):void
         {
-            statusLabel.text = "Image Loaded: " + myImage.fileName;
-            imageInfoLabel.text = "Image Size: " + myImage.imageWidthInMM + " x " + myImage.imageHeightInMM + " mm" + "  |  Burn Time 00.0 Minutes";
+            statusLabel.text = "   Image Loaded: " + myImage.fileName + " (" + myImage.imageWidthInPX + " x " + myImage.imageHeightInPX + " Pixels)";
+            imageInfoLabel.text = "Image Size: ?  |  Burn Time: ?   ";
             showImageOnScreen(myImage.source);
         }
 
         private function resizedImage(event:Event):void
         {
-            statusLabel.text = "Image: "+ myImage.fileName+" (Output Settings Saved) " ;
-            imageInfoLabel.text = "Image Size: " + myImage.imageWidthInMM + " x " + myImage.imageHeightInMM + " mm" + "  |  Burn Time " + (myImage.getPrintTime()).toFixed(1) + " Minutes";
+            statusLabel.text = "   Image: "+ myImage.fileName+" (" + myImage.imageWidthInPX + " x " + myImage.imageHeightInPX + " Pixels)  Output Settings Saved " ;
+            imageInfoLabel.text = "Image Size: " + myImage.imageWidthInMM + " x " + myImage.imageHeightInMM + " mm" + "  |  Burn Time: " + (myImage.getPrintTime()).toFixed(0) + " Minutes";
         }
 
         private function showImageOnScreen(bitmap:Bitmap):void
@@ -173,7 +173,7 @@
 
         private function exportFinished(event:Event):void
         {
-            statusLabel.text = "Export Completed: " + myImage.fileName;
+            statusLabel.text = "Export Completed: " + myImage.fileName + " (" + myImage.imageWidthInPX + " x " + myImage.imageHeightInPX + " Pixels)";
         }
 
         private function btnColorCorrection_clickHandler(event:MouseEvent):void
